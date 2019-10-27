@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Зжатие файлов JS -->
+<!-- ============================================================= -->
+
+<!-- ПАРАМЕТРЫ   -->
+
+<!-- ${minifyjs.dir} - Директория содержащая файлы JS -->
+
+<!-- RESULT - Сжатые файлы рядом с оригиналами  -->
+<!--          К сжатоиу файлу перед рамшерением добавляется прификс min  ( filejs.js => filejs.min.js ) -->
+
+<project name="lib-minifyjs"  default="minifyjs" >
+
+
+    <target name="minifyjs" >
+
+        <echo>START target: minifyjs  </echo>
+
+        <!-- B.18 Отображает все текущие свойства в проекте.-->
+        <echoproperties prefix = "minifyjs." />
+
+        <echo msg="START : Minifying JavaScript files..." />
+
+        <!-- Подключить класс обработчика  COSTOM.PHING.Min      -->
+        <taskdef name="stubjsmin" classname="${GRT.COSTOM_TASK_PHING_DIR}.stubJsMinTask" />
+
+
+
+        <echo msg="Minifying : Delite Min JavaScript files" />
+
+
+        <!-- B.13 Удаляет файл или каталог, или набор файлов, определенных набором файлов -->
+        <delete includeemptydirs="true">
+            <!--  HELP: https://www.phing.info/phing/guide/en/output/chunkhtml/DeleteTask.html      -->
+            <!--  param includeemptydirs(Boolean) Определяет, следует ли также удалять пустые каталоги. Def(false) Required(нет)-->
+            <fileset dir="${minifyjs.dir}">
+                <include name="**/*.min.js" />
+                <!--               -->
+                <!-- <exclude name="global.js" />-->
+            </fileset>
+        </delete>
+
+
+        <fileset id="srcjs" dir="${minifyjs.dir}">
+            <include name="**/*.js" />
+        </fileset>
+        <stubjsmin jsminpath="${GRT.SITE_LIB}/gn_z11/Document/Optimise/jsmin.php"
+                   targetdir="${minifyjs.dir}">
+            <fileset refid="srcjs" />
+        </stubjsmin>
+    </target>
+</project>
+

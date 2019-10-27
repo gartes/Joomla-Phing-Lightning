@@ -1,0 +1,31 @@
+<project name="build_export_comomponent"  default="build_import_comomponent">
+    <target name="build_import_comomponent">
+
+        <!-- C.81  Выделить из пути название компонента    -->
+        <propertyregex
+                property="GRT.name"
+                subject="${project.basedir}"
+                pattern="\/([^\/]+)\/?$"
+                match="$1"
+                casesensitive="false"
+                defaultvalue="Not Found"/>
+        <!-- C.118  Парсинг файла манифеста приложения-->
+        <xmlproperty file="${project.basedir}/${GRT.name}.xml" prefix="GRT." collapseAttributes="true"  />
+        <!-- C.118  Парсинг файла манифеста приложения-->
+        <xmlproperty file="${project.basedir}/${GRT.name}.xml" prefix="GRT.manifest." keepRoot="false" />
+
+
+        <!-- Каталог с Component Media-->
+        <property name="GRT.media_dir" value="${project.basedir}/${GRT.manifest.media(folder)}" />
+
+        <!-- Определение директории загрузки приложения ( components , plugins , moduls , libraries )   -->
+        <property name="GRT.ext_folder" value="${__my_product_path}/${GRT.extension.type}s" />
+        <property name="GTR.ext_folder_name" value="${GRT.ext_folder}/${GRT.name}" />
+
+
+        <property name="GRT.Local_storage_components" value="${GRT.ext_folder}/${GRT.name}s" />
+        <property name="GRT.Local_storage_component_dist" value="${GTR.ext_folder_name}/dist/${GRT.name}_${GRT.manifest.version}" />
+        <property name="GRT.Local_storage_component_zip" value="${GTR.ext_folder_name}/zip" />
+
+    </target>
+</project>

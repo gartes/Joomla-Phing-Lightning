@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--        Сборка расширений Joomla-->
+<!--        https://habr.com/ru/post/212165/-->
+
+<project name="make_project" basedir="../." default="build" >
+
+
+    <!-- Having the user choose from a set of valid choices -->
+    <echo>Старт - PROJECT!!!</echo>
+
+
+
+    <!-- домен сайта   -->
+    <property name="__domen" value="nobd_ml" />
+    <!-- Каталог - Хранения приложений    -->
+    <property name="__my_product_path" value="/media/oleg/UBUNTU_BAK/MY_PRODUCT" />
+
+
+
+
+    <!-- SYS Путь к папке   libraries  -->
+    <property name="GRT.SITE_LIB" value="/var/www/${__domen}/html/libraries" />
+    <!-- SYS Путь к папке  с PHP классам  Phing -->
+    <property name="GRT.COSTOM_TASK_PHING_DIR" value="${GRT.SITE_LIB}/phing/costom_tasks" />
+
+
+
+
+
+    <!-- B.49 TstampTask   -->
+    <tstamp>
+        <format property="date_time" pattern="%Y%m%d_%H%M"/>
+    </tstamp>
+    <echo msg="date_time - ${date_time}" />
+
+
+    <echo>${GRT}</echo>
+
+    <!-- B.18 Отображает все текущие свойства в проекте.-->
+    <!--    <echoproperties prefix="GRT" />-->
+
+
+
+    <!--  GLOBAL START  -->
+    <target name="build" >
+        <echo msg="Build Start" />
+        <echo>*********** SELECT TASK ***************</echo>
+        <echo>0-[EXIT]</echo>
+        <echo>1-[Import-Live-Component]</echo>
+        <echo>2-[Export-Component-Server]</echo>
+
+        <echo>***************************************</echo>
+
+
+        <input defaultValue="1" propertyname="inputTask"
+               validargs="0,1,2">
+            Выбрать задачу:
+        </input>
+
+
+
+
+        <!--  Если просто выход -->
+        <!-- B.25 InputTask -->
+        <if>
+            <equals arg1="${inputTask}" arg2="0" />
+            <then>
+                <fail message="Выход из приложения! EXIT" />
+            </then>
+        </if>
+
+
+        <echo>${inputTask}</echo>
+        <!-- B.22 IfTask -->
+        <if>
+            <equals arg1="${inputTask}" arg2="1" />
+            <then>
+                <echo message="Импорт компонента из сайта!!!" />
+                <echo>Start :_phing/models/import_comomponent.xml</echo>
+                <phingcall target="GET_model_Import_Live_Component" />
+            </then>
+
+            <elseif>
+                <equals arg1="${inputTask}" arg2="2" />
+                <then>
+                    <fail message="__STOP__ Export-Component-Server" />
+                </then>
+            </elseif>
+
+
+
+
+            <!--            <elseif>-->
+<!--                -->
+<!--                <equals arg1="${inputTask}" arg2="Export-Component-Server" />-->
+<!--                <then>-->
+<!--                    -->
+<!--                    <echo message="The value of property Import-Live-Component" />-->
+<!--                    <phingcall target="GET_model_Export_Component_Server" />-->
+<!--                </then>-->
+<!--            </elseif>-->
+
+
+        </if>
+
+<!--        <echo>++++++++++++++++</echo>-->
+<!--        <echo> type (component,plugin,modul,library,template) - ${GRT.extension.type}</echo>-->
+<!--        <echo> version - ${GRT.manifest.version}</echo>-->
+<!--        <echo> name - ${GRT.name}</echo>-->
+<!--        <echo> Путь к папке проекта -   ${project.basedir}</echo>-->
+<!--        <echo> Путь к папке медиа -   ${GRT.media_dir}</echo>-->
+<!--        <echo> Путь к папке сохранения компонента -   ${GRT.Local_storage_component}</echo>-->
+<!--        <echo> Путь к папке сохранения компонента дистрибутив -   ${GRT.Local_storage_component_dist}</echo>-->
+<!--        <echo> Путь к папке сохранения компонента instal zip  -   ${GRT.Local_storage_component_zip}</echo>-->
+
+<!--        <echo>++++++++++++++++</echo>-->
+
+        <!-- Вызов задачи для сжатия JS файлов        -->
+<!--        <phingcall target="EXT_minifyjs" />-->
+<!--        <phingcall target="GET_model_comomponent" />-->
+    </target>
+
+
+
+
+
+
+    <!-- имопрт компонента для разработки .phing/models/import_comomponent.xml-->
+    <target name="GET_model_Import_Live_Component" description="Model Import comomponent">
+
+        <!-- B.30 Эта задача вызывает другой файл сборки.        -->
+        <phing phingfile="import_comomponent.xml" dir="_phing/models" target="build_import_comomponent">
+            <!-- B.34  определить userсвойства в вашем файле сборки -->
+<!--            <property name = "Model.comomponent.project_dir" value = "${project.basedir}" />-->
+        </phing>
+    </target>
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Экспорт компонента в ZIP архив .phing/models/export_comomponent.xml-->
+    <target name="GET_model_Export_Component_Server" description="Model Export Сomomponent - ZIP">
+        <!-- B.30 Эта задача вызывает другой файл сборки.        -->
+        <phing phingfile="export_comomponent.xml" dir=".phing/models" target="build_export_comomponent">
+            <!-- B.34  определить userсвойства в вашем файле сборки -->
+<!--            <property name = "Model.comomponent.project_dir" value = "${project.basedir}" />-->
+        </phing>
+    </target>
+
+
+
+
+
+
+
+
+
+    <!-- Сборка копонента в папку дистрибутивов .phing/models/comomponent.xml-->
+    <target name="GET_model_comomponent" description="Model comomponent">
+        <!-- B.30 Эта задача вызывает другой файл сборки.        -->
+        <phing phingfile="comomponent.xml" dir=".phing/models" target="build_comomponent">
+            <!-- B.34  определить userсвойства в вашем файле сборки -->
+            <property name = "Model.comomponent.project_dir" value = "${project.basedir}" />
+        </phing>
+    </target>
+
+
+
+    <!-- Сборка компонента   -->
+    <target name="_add_comomponent">
+
+
+
+
+
+        <!-- Упаковка исходников в архив -->
+        <!-- Прочитать установочный xml-файл. Префикс нужен для разграничения расширений. -->
+<!--        <xmlproperty file="${project.basedir}/${EXT_NAME}.xml" prefix="_pref." keepRoot="false" />-->
+
+        <!-- Создать установочный файл с номером версии. Номер прочтен из xml-файла -->
+<!--        <property name="_ver" value="_pref.version" />-->
+<!--        <zip destfile="${res_dir}/com_vm_product_comparisons-${_ver}_${date_time}.zip" basedir="${res_dir}/src" />-->
+
+
+
+        <!--        <copy file="${res_dir}/cache/com_test.zip"-->
+        <!--              tofile="${res_dir}/src_zip/com_vm_product_comparisons-${com_vm_product_comparisons.version}.zip" overwrite="true"/>-->
+
+    </target>
+    <!-- END Сборка компонента   -->
+
+
+
+
+    <!--    Удаление старых версий -->
+    <target name="_clean">
+        <echo>Clean Start</echo>
+        <!-- Команда delete удаляет указанные в ней наборы файлов fileset -->
+        <delete includeemptydirs="true">
+            <fileset dir="${res_dir}">
+                <!-- Можно перечислить файлы и/или указать маску -->
+                <include name="**"/>
+            </fileset>
+        </delete>
+    </target>
+    <!-- END Удаление старых версий  -->
+
+
+    <!-- Minifer files JS .phing/lib/minifyjs.xml-->
+    <target name="EXT_minifyjs" description="Javascript minifer">
+        <!-- B.30 Эта задача вызывает другой файл сборки.        -->
+        <phing phingfile="minifyjs.xml" dir=".phing/lib" target="minifyjs">
+            <!-- B.34  определить userсвойства в вашем файле сборки -->
+            <property name = "minifyjs.dir" value = "${GRT.media_dir}/js" />
+        </phing>
+    </target>
+
+</project>
+

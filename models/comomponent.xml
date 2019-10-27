@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Собрать компонент в папку дистрибутивов  -->
+<!-- ============================================================= -->
+
+<!--==================== ПАРАМЕТРЫ =============================== -->
+
+
+
+
+<project name="Model_comomponent"  default="build_comomponent">
+    <target name="build_comomponent">
+        <echo>******************************************</echo>
+        <echo>START Model-comomponent::build_comomponent</echo>
+        <echo>******************************************</echo>
+
+        <echo>${GRT.Local_storage_component_dist}/site</echo>
+        <echo>${Model.comomponent.project_dir}/components/com_${GRT.name}</echo>
+
+        <!-- Копировать файлы в папку исходников компонента -->
+
+        <!-- Пользовательская часть -->
+        <!-- B.11 CopyTask -->
+        <copy todir="${GRT.Local_storage_component_dist}/site" overwrite="true">
+            <!-- D.4 FileSet           -->
+            <fileset dir="${Model.comomponent.project_dir}/components/com_${GRT.name}">
+                <include name="**" />
+            </fileset>
+        </copy>
+
+        <!-- Административная часть -->
+        <copy todir="${GRT.Local_storage_component_dist}/admin" overwrite="true">
+            <fileset dir="${Model.comomponent.project_dir}/administrator/components/com_${GRT.name}">
+
+                <!-- Копировать все, кроме файла манифеста -->
+                <!--                <exclude name="${project.basedir}/administrator/test.xml" />-->
+            </fileset>
+        </copy>
+
+        <!-- Файлы из папки media -->
+        <copy todir="${GRT.Local_storage_component_dist}/media" overwrite="true">
+            <fileset dir="${Model.comomponent.project_dir}/media/com_${GRT.name}">
+                <include name="**" />
+            </fileset>
+        </copy>
+
+        <!-- Файлы в корень компонента       -->
+        <copy todir="${GRT.Local_storage_component_dist}" overwrite="true">
+            <fileset dir="../../.">
+                <include name = "${GRT.name}.xml" />
+                <include name = "script.php" />
+                <include name = "LICENSE" />
+            </fileset>
+        </copy>
+
+        <echo>//////////////////////////////////////////</echo>
+        <echo>END Model-comomponent::build_comomponent</echo>
+        <echo>//////////////////////////////////////////</echo>
+    </target>
+</project>

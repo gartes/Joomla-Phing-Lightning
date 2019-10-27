@@ -1,0 +1,182 @@
+<!--  ====================================================================  -->
+<!--  Импорт Компонента из установленной JOOMLA  -->
+<!--  ====================================================================  -->
+
+<project name="Model_import_comomponent"  default="build_import_comomponent">
+    <target name="build_import_comomponent">
+        <!-- Домен сайта B.25 InputTask-->
+        <input propertyname="Site.Domen" defaultValue="nobd.ml">Лакальный домен сайта</input>
+        <!-- Назване компонента  B.25 InputTask-->
+        <input propertyname="Site.Component" defaultValue="vm_product_comparisons">Название копонента</input>
+
+        <!-- Директория сайта (преобразовать nobd.ml а nobd_ml )  -->
+        <propertyregex property="Site.Folder"
+                       subject="${Site.Domen}"
+                       pattern="(.+)\.(.+)$"
+                       replace="$1_$2"
+                       casesensitive="false"
+                       defaultvalue="ERROR_FOLDER"/>
+
+        <!-- Если не удалось преобразовать домен в локальную директорию -->
+        <if> <equals arg1="${Site.Folder}" arg2="ERROR_FOLDER" />
+            <then>
+                <echo>Не удалось установить локальную директорию сайта</echo>
+                <!-- Директория сайта B.25 InputTask-->
+                <input propertyname="Site.Folder"
+                       defaultValue="nobd_ml">Укажите локальную директорию сайта (пример nobd_ml)</input>
+            </then>
+        </if>
+
+
+        <!-- Путь к сайту  -->
+        <property name="Site.Path" value="/var/www/${Site.Folder}/html" />
+
+        <!-- Проверка путь к локальному сайту       -->
+        <available file="${Site.Path}" type="dir" property="Site.Path.Yes" />
+        <if>
+            <equals arg1="${Site.Path.Yes}" arg2="true" />
+            <then>
+                <echo message="Директория сайта найдена" />
+            </then>
+            <else>
+                <echo message="Локальная Директория сайта не найдена" />
+                <input propertyname="Site.Folder" defaultValue="nobd_ml">Укажите локальную директорию сайта (пример nobd_ml)</input>
+            </else>
+        </if>
+
+
+
+
+
+        <!-- Путь к папке администратора -->
+        <property name="Site.Path.Administrator" value="${Site.Path}/administrator" />
+        <!-- Путь к папке Администратор.компонент  -->
+        <property name="Site.Path.Administrator.Components" value="${Site.Path.Administrator}/components/com_${Site.Component}" />
+        <!-- Путь к папке Компонент  -->
+        <property name="Site.Path.Components" value="${Site.Path}/components/com_${Site.Component}" />
+
+        <!-- Каталог проекта       -->
+        <property name="Project.Folder" value="${project.basedir}/../.." />
+        <!-- Каталог администратора в проекте         -->
+        <property name="Project.Administrator.Component" value="${Project.Folder}/administrator/components/com_${Site.Component}" />
+
+
+
+
+
+        <!-- Создать в проекте папку Administrator -->
+        <mkdir dir="${Project.Administrator.Component}" />
+
+
+        <!-- Файлы в проект папку Администратор B.11 CopyTask -->
+        <copy todir="${Project.Administrator.Component}" overwrite="true">
+            <fileset dir="${Site.Path.Administrator.Components}/">
+                <include name="**" />
+                <exclude name = "**/${Site.Component}.xml" />
+                <exclude name = "**/script.php" />
+            </fileset>
+        </copy>
+
+        <!-- Файлы В корень проекта  B.11 CopyTask -->
+        <copy todir="${Project.Folder}" >
+            <fileset dir="${Site.Path.Administrator.Components}">
+                <include name="**/${Site.Component}.xml" />
+                <include name="**/script.php" />
+            </fileset>
+        </copy>
+
+
+
+        <!-- Файлы в проект папку Components B.11 CopyTask -->
+        <copy todir="${Project.Folder}/components/com_${Site.Component}" overwrite="true">
+            <fileset dir="${Site.Path.Components}/">
+                <include name="**" />
+            </fileset>
+        </copy>
+
+
+        <!-- C.118  Парсинг файла манифеста приложения-->
+        <xmlproperty file="${Project.Folder}/${Site.Component}.xml" prefix="GRT." collapseAttributes="false"  />
+
+
+        <!-- Путь к каталогу медиа Компонента  -->
+        <property name="Site.Path.Media.Components" value="${Site.Path}/media/com_${Site.Component}" />
+        <!-- Директория Media - в корень проекта Media B.11 CopyTask -->
+        <copy todir="${Project.Folder}/media/${GRT.extension.media(destination)}" overwrite="true">
+            <fileset dir="${Site.Path.Media.Components}/">
+                <include name="**" />
+            </fileset>
+        </copy>
+
+
+
+
+
+
+        <!-- Копирование Языковых файлов Админ панели -->
+        <copy todir="${Project.Administrator.Component}" haltonerror="true" verbose="true">
+            <filelist dir="${Site.Path.Administrator}" files="${GRT.extension.administration.languages.language}"/>
+        </copy>
+
+
+        <!--  Копирование языковых файлов для сайта  -->
+        <copy todir="${Project.Folder}/components/com_${Site.Component}" haltonerror="true" verbose="true">
+            <filelist dir="${Site.Path}" files="${GRT.extension.languages.language}"/>
+        </copy>
+
+
+
+
+
+
+
+<!--        <echoproperties prefix="Project." />-->
+<!--        <echoproperties prefix="Site." />-->
+<!--        <echoproperties prefix="language." />-->
+
+
+<!--        <echo>${Site.Component}</echo>-->
+<!--        <echo>${GRT.extension.languages.language}</echo>-->
+
+
+
+
+<!--        <copy todir="${Project.Administrator.Component}" overwrite="true">-->
+<!--            <fileset dir="${Site.Path.Administrator}" >-->
+<!--                <include name="${GRT.extension.administration.languages.language}" />-->
+<!--            </fileset>-->
+<!--        </copy>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--        <echo>${Site.Path.Administrator}</echo>-->
+<!--        <echo>${GRT.extension.administration.languages.language}</echo>-->
+<!---->
+<!---->
+<!--        <echo>${Site.Component}.xml</echo>-->
+<!--        <echo>${Site.project}/administrator/com_${Site.Component}</echo>-->
+<!--        <echo>${Site.project}</echo>-->
+
+
+<!--        <echoproperties   />-->
+<!--        <echoproperties prefix="Project." />-->
+<!--        <echoproperties prefix="Site." />-->
+        <echoproperties prefix="GRT." />
+
+        <!-- B.20 FailTask        -->
+        <!-- <fail message="__STOP__ Import-Live-Component" />-->
+
+
+
+    </target>
+</project>
