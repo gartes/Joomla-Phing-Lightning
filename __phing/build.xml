@@ -11,7 +11,7 @@
 
 
     <!-- домен сайта   -->
-    <property name="__domen" value="nobd_ml" />
+    <property name="__domen" value="nobd.ml" />
     <!-- Каталог - Хранения приложений    -->
     <property name="__my_product_path" value="/media/oleg/UBUNTU_BAK/MY_PRODUCT" />
 
