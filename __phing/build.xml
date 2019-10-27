@@ -34,11 +34,11 @@
     <echo msg="date_time - ${date_time}" />
 
 
-
-
-
-
     <echo>${GRT}</echo>
+
+
+
+
 
     <!-- B.18 Отображает все текущие свойства в проекте.-->
     <!--    <echoproperties prefix="GRT" />-->
